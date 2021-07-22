@@ -1,5 +1,7 @@
-import React from 'react';
-import { FiMail, FiUser, FiLock, FiArrowLeft} from 'react-icons/fi'
+import React, {useCallback} from 'react';
+import { FiMail, FiUser, FiLock, FiArrowLeft} from 'react-icons/fi';
+import { Form } from '@unform/web';
+import * as Yup from 'yup';
 
 import LogoImg from '../../assets/logo.svg';
 
@@ -9,13 +11,30 @@ import Button from '../../components/Button';
 
 import { Container, Content, Background } from './styles';
 
-const Signup: React.FC = () => (
-  <Container>
+const Signup: React.FC = () => {
+  const handleSubmit= useCallback(async(data: object) => {
+    try {
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        email: Yup.string().required('Email obrigatório').email('Digite um email válido'),
+        password: Yup.string().min(6, ' '),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
+  return (
+    <Container>
     <Background/>
     <Content>
       <img src={ LogoImg } alt="GoBarber"/>
 
-      <form>
+      <Form onSubmit={handleSubmit}>
         <h1>Faça seu cadastro</h1>
 
         <Input name="name" icon={FiUser} placeholder="Nome" />
@@ -24,7 +43,7 @@ const Signup: React.FC = () => (
         <Input name="password" icon={FiLock} type="password" placeholder="Senha"  />
 
         <Button type="submit">Cadastrar</Button>
-      </form>
+      </Form>
 
       <a href="cadastro">
         <FiArrowLeft/>
@@ -32,6 +51,7 @@ const Signup: React.FC = () => (
       </a>
     </Content>
   </Container>
-);
+  )
+}
 
 export default Signup;
